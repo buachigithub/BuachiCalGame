@@ -1,0 +1,558 @@
+screen 0,800,600
+#include "d3m.hsp"
+kik = "1ちゃんねる"
+teki1 = "めっさ強い敵"
+teki2 = "マヂ強い敵"
+teki3 = "(´・ω・`)"
+hp1 = 100 ;80ぐらい
+hp2 = 90
+hp3 = 70
+title "Buachi作計算ゲーム"
+*login
+	celload "login.png",1
+	username = "user"
+	objimage 1
+	mes "ユーザー名を入力してください。無ければ、入力して新規作成してください。"
+	input username
+	button goto "",*userread
+	celload "sinki.png",2
+	objimage 2
+	button goto "",*adduser
+	celload "button.png",3
+	objimage 3
+	stop
+*userread
+	bload username+"data",lv
+	goto *home
+	stop
+*adduser 
+	lv = 1
+	bsave username+"data",lv
+	goto *home
+;chgdisp 1
+*home
+kikan = "敵の小人"
+cls
+mes username+"さん！ようこそ！"+lv+"レベルです!"
+title "最後の結果[通常モード]正解数:"+nan+"問正解 [RTA]スコア:"+kariscore+""
+kai = 0
+kariscore = 0
+font "MS ゴシック",30
+mes "計算ゲーム Ver0.8 By Buachi#1111"
+objsize 150,30
+font "MS 明朝"
+button goto "クイックモード(10回挑戦)",*q
+mes "クイックモードはすぐ始まります"
+button goto "カスタムモード",*kas
+mes "挑戦回数を指定することができます"
+button goto "RTA?(バトル用、鬼畜)",*rta
+mes "計算能力、瞬発力を数値として出せます"
+button goto "RTA?(上の引き算バージョン)",*mrta
+mes "上に書いてあるものの引き算バージョン"
+button goto "Online",*online
+mes "Betaです"
+button goto "2人パーティーゲーム",*party
+mes "2人専用。交互でプレイします。多分盛り上がります。"
+button goto "RPGかもしれないゲーム",*rpg
+mes "そのままです。"
+button goto "言葉ジェネレータ",*kotoba
+mes "言葉をランダムに生成してくれます"
+button goto "終了",*enaaa
+pos 390,60
+mes "===バージョン履歴==="
+mes "Ver.0.8 期間限定キャラクターが変わりました！"
+mes "Ver.0.7.1 ボタンのデザインを変更!"
+mes "Ver.0.7 細かなバグを修正"
+mes "Ver.0.6 レベルをつけるためにログイン制度を追加"
+mes "Ver.0.5.1 細かなバグを修正"
+mes "Ver.0.5 【大型アップデート】RPGを追加"
+mes "Ver.0.4.6 ウィンドウサイズを大きくしました。"
+mes "Ver.0.4.5 パーティーゲームを追加"
+mes "Ver.0.4 説明を追加
+mes "Ver.0.3 RTAの引き算バージョンを追加"
+mes "Ver.0.2 RTA?モードを追加、結構多くの方に公開"
+mes "Ver.0.1 一部の方に公開"
+se = 0
+stop
+
+*kaizyo
+chgdisp
+ful = "スクリーン"
+goto *home
+*kas
+cls
+mes "何問解きますか?"
+nan = 5
+input nan
+kai = 0
+button goto "解く",*loo
+stop
+*q
+nan = 10
+*loo
+cls
+if nan = kai : goto *ed
+kai = kai + 1
+pos 350,0
+title "第"+kai+"問("+nan+"回挑戦)正解数:"+se+"回
+mes "第"+kai+"問("+nan+"回挑戦)"
+randomize
+x = rnd(10)
+y = rnd(10)
+pos 390,30
+mes ""+x+"+"+y+"は?"
+mon = x+y
+pos rnd(300),rnd(300)
+button goto "["+mon+"]",*sei
+mon = x+y+2+rnd(5)
+pos rnd(300),rnd(300)
+button goto "["+mon+"]",*no
+mon = x+y-10+rnd(5)
+pos rnd(300),rnd(300)
+button goto "["+mon+"]",*no
+mon = x+y+10+rnd(7)
+pos rnd(300),rnd(300)
+button goto "["+mon+"]",*no
+mon = x+y-10+rnd(4)
+pos rnd(300),rnd(300)
+button goto "["+mon+"]",*no
+objsize 150,30
+pos 350,60
+mes "制限時間は3秒です"
+wait 300
+goto *seigen
+*sei
+cls
+mes "正解!"
+button goto "次へ",*tugi
+se = se+1
+stop
+*no
+cls
+mes "不正解..."
+button goto "次へ",*tugi
+stop
+*seigen
+cls
+mes "制限時間に間に合わなかった..."
+button goto "次へ",*tugi
+stop
+*tugi
+goto *loo
+*ed
+mes "がんばりましたねぇ！"
+mes "あなたの正解数は"+nan+"回挑戦して"+se+"回です"
+lv = lv + se
+bsave username+"data",lv
+mes ""+lv+"レベルになりました！"
+button goto "戻る",*home
+stop
+*enaaa
+end
+*rta
+cls
+mes "このモードではスコアが出力されます。"
+mes "友達と競いましょう！"
+button goto "プレイする",*rtaplay
+button goto "戻る",*home
+stop
+*rtaplay
+cls
+mes 3
+wait 100
+mes 2
+wait 100
+mes 1
+wait 100
+rkai = 11
+goto *rl
+*seir
+cls
+aaa = 0
+aaa = d3timer() - time
+kariscore = kariscore + 8000 - aaa
+mes "正解!現在のスコア:"+kariscore+""
+wait 100
+*rl
+rkai = rkai - 1
+if rkai < 0 : goto *rtaen
+cls
+title "あと"+rkai+"回、現在のスコア:"+kariscore+""
+mes "あと"+rkai+"回"
+time = d3timer()
+randomize
+x = rnd(35)
+y = rnd(50)
+pos 390,30
+mes ""+x+"+"+y+"は?"
+mon = x+y
+pos rnd(300),rnd(300)
+button goto "["+mon+"]",*seir
+mon = x+y+2+rnd(5)
+pos rnd(300),rnd(300)
+button goto "["+mon+"]",*nor
+mon = x+y-10+rnd(5)
+pos rnd(300),rnd(300)
+button goto "["+mon+"]",*nor
+mon = x+y+10+rnd(7)
+pos rnd(300),rnd(300)
+button goto "["+mon+"]",*nor
+mon = x+y-10+rnd(4)
+pos rnd(300),rnd(300)
+button goto "["+mon+"]",*nor
+objsize 150,30
+stop
+*nor 
+cls
+mes "不正解...現在のスコア:"+kariscore+""
+wait 100
+goto *rl
+*rtaen
+cls
+mes "RTAお疲れ様です"
+mes "====スコア===="
+mes kariscore
+fueta = kariscore / 10000
+lv = lv + fueta
+bsave username+"data",lv
+mes ""+lv+"レベルになりました！"
+button goto "戻る",*home
+stop
+
+*mrta
+cls
+mes "このモードではスコアが出力されます。"
+mes "友達と競いましょう！これは引き算バージョンです"
+button goto "プレイする",*mrtaplay
+button goto "戻る",*home
+stop
+*mrtaplay
+cls
+mes 3
+wait 100
+mes 2
+wait 100
+mes 1
+wait 100
+rkai = 11
+goto *rlm
+*mseir
+cls
+aaa = 0
+aaa = d3timer() - time
+kariscore = kariscore + 8000 - aaa
+mes "正解!現在のスコア:"+kariscore+""
+wait 100
+*rlm
+rkai = rkai - 1
+if rkai < 0 : goto *rtaenm
+cls
+title "あと"+rkai+"回、現在のスコア:"+kariscore+""
+mes "あと"+rkai+"回"
+time = d3timer()
+randomize
+x = rnd(65)
+y = rnd(30)
+pos 390,30
+mes ""+x+"-"+y+"は?"
+mon = x-y
+pos rnd(300),rnd(300)
+button goto "["+mon+"]",*mseir
+mon = x-y+2+rnd(5)
+pos rnd(300),rnd(300)
+button goto "["+mon+"]",*norm
+mon = x-y-10+rnd(5)
+pos rnd(300),rnd(300)
+button goto "["+mon+"]",*norm
+mon = x-y+10+rnd(7)
+pos rnd(300),rnd(300)
+button goto "["+mon+"]",*norm
+mon = x-y-10+rnd(4)
+pos rnd(300),rnd(300)
+button goto "["+mon+"]",*norm
+objsize 150,30
+stop
+*norm
+cls
+mes "不正解...現在のスコア:"+kariscore+""
+wait 100
+goto *rlm
+*rtaenm
+cls
+mes "RTAお疲れ様です"
+mes "====スコア===="
+mes kariscore
+fueta = kariscore / 10000
+lv = lv + fueta
+bsave username+"data",lv
+mes ""+lv+"レベルになりました！"
+button goto "戻る",*home
+stop
+*party
+cls
+ip = 0
+ap = 0
+partymon = 3
+mes "1人目がOKを押してください。相手に見えないようご注意ください"
+button goto "OK",*apartyok
+stop
+*apartyok
+	cls
+mes "5秒以内に下の問題を解いてください。"
+randomize
+x = rnd(50)
+y = rnd(30)
+mes ""+x+" + "+y+""
+input a
+wait 500
+cls
+mes "2人目がOKを押してください。相手に見えないようご注意ください"
+button goto "OK",*apartyoktwo
+stop
+*apartyoktwo
+cls
+mes "5秒以内に下の問題を解いてください。"
+mes ""+x+" + "+y+""
+input i
+wait 500
+cls
+if x + y = a : mes "１人目正解！" : ap = ap + 1
+if x + y != a : mes "１人目不正解！"
+if x + y = i : mes "２人目正解！" : ip = ip + 1
+if x + y != i : mes "２人目不正解！"
+button goto "次へ",*tugie
+stop
+*tugie
+partymon = partymon - 1
+if partymon = 0 : goto *partyend
+
+cls
+mes "1人目がOKを押してください。相手に見えないようご注意ください"
+button goto "OK",*apartyok
+stop
+*partyend
+	cls
+mes "結果発表！"
+mes "１人目:"+ap+"POINT"
+mes "２人目:"+ip+"POINT"
+if ap > ip : mes "1人目の勝利！"
+if ip > ap : mes "2人目の勝利！"
+lv = lv + ap + ip
+bsave username+"data",lv
+mes ""+lv+"レベルになりました！"
+button goto "戻る",*home
+stop
+
+*rpg
+	cls
+	sinkou = 3
+	button goto "初めから",*save
+	mes "データ容量をたぶん1Byteぐらい消費します。"
+	button goto "続きから",*load
+	button goto "戻る",*home
+	stop
+*load
+	cls
+	mes "読み込み中"
+	bload username+"rpg",sinkou
+	cls
+	mes "読み込み完了"
+	wait 100
+	cls
+	goto *rpghome
+*save
+	cls
+	bsave username+"rpg",sinkou
+	mes "セーブ完了！
+	wait 100
+	cls
+*rpghome
+	cls
+	button goto "セーブ",*save
+	button goto "戻る",*home
+	mes "セーブしていないデータは消えます。"
+	mes "=================================="
+	mes "現在の進行度:"+sinkou+""
+	mes "自分のHP:"+sinkou*100+""
+	button goto "旅に出る",*tabi
+	button goto "SHOP",*shop
+	stop
+*shop
+	dialog "未完成"
+	goto *rpghome
+*tabi
+	cls
+	mes "☆バージョン限定☆経験値3倍☆"
+	button goto ""+kik+"",*kika
+	mes "通常ゲーム。通常はこれをしましょう。"
+	button goto "通常第"+sinkou+"章",*normal
+	button goto "戻る",*rpghome
+	stop
+*kika
+	randomize
+	teki=rnd(2)
+	cls
+	hp = sinkou * 100
+	mes "早速敵が現れた！"
+	bonus = 3
+	if teki = 0 : goto *kyuradora
+	if teki = 1 : goto *kyuradora2
+	if teki = 2 : goto *datensi
+	
+	stop
+*kyuradora
+	mes "「"+teki1+"」が現れた！"
+	tekihp = hp1*sinkou
+	wait 100
+	goto *sentou
+	stop
+*kyuradora2
+	mes "「"+teki2+"」が現れた！"
+	tekihp = hp2*sinkou
+	wait 100
+	goto *sentou
+	stop
+*datensi
+	mes "「"+teki3+"」が現れた！"
+	tekihp = hp3*sinkou
+	wait 100
+	goto *sentou
+	stop
+*normal
+	cls
+	HP = sinkou * 100
+	mes "「スライム」が現れた！"
+	tekihp = 50*sinkou
+	bonus = 1
+	wait 100
+	goto *sentou
+	stop
+stop
+*sentou
+	ataku = 0
+	cls
+	if hp < 1 : goto *makerpg
+	if tekihp < 1 : goto *kachirpg
+	mes "自分のHP:"+hp+""
+	mes "相手のHP:"+tekihp+""
+	mes "あと5秒で入力ボックスが表示されます。準備してください。"
+	wait 500
+	cls
+	randomize
+	x = rnd(sinkou*tekihp/10)
+	y = rnd(sinkou*tekihp/10)
+	mes ""+x+"+"+y+"を解いてください！"
+	input ataku
+	seige = 0
+	seige = sinkou /3+5
+	mes "制限時間:"+seige+"秒"
+	button goto "スキップ",*skiprpg
+	wait seige*100
+*skiprpg
+	cls
+	if ataku = x+y : goto *seikairpg
+	mes "不正解..."
+	goto *aite
+*seikairpg
+	aaaa = x + y * 5
+	mes "正解！相手に"+aaaa+"ダメージ！"
+	tekihp = tekihp - aaaa
+*aite
+	mes "相手のターン！"
+	mes "自分に"+tekihp+"ダメージ！痛い！"
+	hp = hp - tekihp
+	button goto "次へ",*sentou
+	stop
+*makerpg
+	herusinkoudo = sinkou / 3
+	mes "負けてしまった...進行度が"+herusinkoudo+"減った..."
+	sinkou = sinkou - herusinkoudo
+	button goto "戻る",*rpghome
+	stop
+*kachirpg
+	sinkou = sinkou + hp / 50 + bonus
+	mes "勝ち！進行度が"+sinkou+"になった！"
+	lv = lv + sinkou / 100
+	bsave username+"data",lv
+	mes ""+lv+"レベルになりました！"
+	button goto "戻る",*rpghome
+	stop
+*kotoba
+	cls
+	button goto "生成",*kotobaseisei
+	button goto "戻る",*home
+	stop
+*kotobaseisei
+	cls
+	randomize
+	button goto "戻る",*kotoba
+	;いつどこでなにを
+	itu1 = rnd(5)
+	if itu1 = 0 : itu = "今、"
+	if itu1 = 1 : itu = "1年後、"
+	if itu1 = 2 : itu = "10年後、"
+	if itu1 = 3 : itu = "1分後、"
+	if itu1 = 4 : itu = "100万年後、"
+	if itu1 = 5 : itu = "１億年後、"
+	dokode2 = rnd(5)
+	if dokode2 = 0 : dokode = "アマゾンの奥地で"
+	if dokode2 = 1 : dokode = "謝罪会見の会場で"
+	if dokode2 = 2 : dokode = "カラオケボックスで"
+	if dokode2 = 3 : dokode = "ライブ会場で"
+	if dokode2 = 4 : dokode = "電車内で"
+	if dokode2 = 5 : dokode = "牢屋の中で"
+	naniwo3 = rnd(5)
+	if naniwo3 = 0 : naniwo = "子供の時の友達と再会した"
+	if naniwo3 = 1 : naniwo = "歌った"
+	if naniwo3 = 2 : naniwo = "足をひねった"
+	if naniwo3 = 3 : naniwo = "足の小指をぶつけた"
+	if naniwo3 = 4 : naniwo = "踊った"
+	if naniwo3 = 5 : naniwo = "変顔をした"
+	mes itu+dokode+naniwo
+	stop
+*online
+	stop
+	cls
+	#include "hspinet.as"
+	netinit
+	URI = "https://api.a3rt.recruit-tech.co.jp/talk/v1"
+	URL = "/smalltalk/"
+	apikey = "apikey=DZZ14t2DpaLYpoxQS1cycGg1km856rG2"
+	neturl URI
+	netrequest URL
+	urll="http://api.a3rt.recruit-tech.co.jp/talk/v1/smalltalk/"
+	netrequest URL+apikey
+	mes "接続中..."
+	netdlname "output.txt"
+*mainnet
+//取得待ち確認
+    netexec res
+    if res > 0 : goto *comp
+    if res < 0 : goto *bad
+    await 50
+    goto *mainnet
+
+*bad
+//エラー
+    neterror estr
+    dialog "ERROR "+estr
+    goto *home
+    stop
+
+*comp
+	cls
+    mes "ロード完了"
+*chatmain
+	cls
+	button goto "再読み込み",*chatmain
+	input naiyou
+	button goto "送信",*requestss
+    neturl ""
+    addmessages = "/messages"
+	stop
+*requestss
+	cls
+	netdlname "output.txt"
+	netrequest addmessages+"?method=POST&body="+username+chatinput
+	mes "送信完了！"
+	goto *chatmain
